@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { Router } from '@angular/router';
+import { Service } from './.././service.model'; // Import the model
 
 @Component({
   selector: 'app-home',
@@ -9,25 +10,29 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
   content: string | null = null;
-  services = [
-    { name: 'Web Development', description: 'Custom web applications and websites.' },
-    { name: 'Mobile Development', description: 'iOS and Android apps tailored to your needs.' },
-    { name: 'SEO Optimization', description: 'Optimize your website for better search engine rankings.' }
-  ];
-
+  services: Service[] = [];
   constructor(private apiService: ApiService, private router: Router) { }
 
   ngOnInit(): void {
-
+    this.getDynamicContent();
   }
 
   // Api fetching 
   getDynamicContent() {
+    console.log("inside code");
     this.apiService.fetchDynamicContent().subscribe({
-      next: (data) => (this.content = data.body),
-      error: () => (this.content = 'Failed to load content.'),
+      next: (data) => {
+        console.log('Fetched data:', data);  // Log the fetched data to the console
+        // Map the response data to the Service model
+        this.services = data.map((item: any) => new Service(item.name, item.description));
+      },
+      error: () => {
+        // Handle error if needed
+        console.error('Error fetching data');
+      }
     });
   }
+  
 
   navigateToHome() {
     this.router.navigate(['/contact']); 

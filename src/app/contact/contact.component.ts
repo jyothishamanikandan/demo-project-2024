@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';  // Import necessary Angular classes
+import emailjs from 'emailjs-com';
 
 @Component({
   selector: 'app-contact',
@@ -28,6 +29,7 @@ export class ContactComponent implements OnInit {
       console.log(this.contactForm.value);  // Here we can send the form data to an API
       // Simulate form submission (e.g., send data to API)
       // Here we'll just display a success message
+      this.sendEmail(this.contactForm.value); // Pass the entire form value object
       this.successMessage = 'Your message has been sent successfully!';
 
       // reset the form after submission
@@ -37,10 +39,36 @@ export class ContactComponent implements OnInit {
     } else {
       console.log('Form is invalid');
     }
-
   }
 
   close(): void {
     this.showMessage = false; // Close modal
+  }
+
+  // Update sendEmail method to accept the full form data
+  sendEmail(formData: { email: string, name: string, message: string }) {
+    const templateParams = {
+      to_email: formData.email, // Receiver's email
+      reply_to: formData.email,
+      subject: 'Confirmation Mail From My Business', // Email subject
+      message: `
+
+      Name :  ${formData.name}
+      Email : ${formData.email}
+      Message :  ${formData.message}
+  
+    `,
+    };
+
+    emailjs
+      .send('service_r3vzupu', 'template_fmyu8vt', templateParams, 'pDY4-8vyeh_IAsPng')
+      .then(
+        (response) => {
+          console.log('Email sent successfully:', response);
+        },
+        (error) => {
+          console.error('Failed to send email:', error);
+        }
+      );
   }
 }
